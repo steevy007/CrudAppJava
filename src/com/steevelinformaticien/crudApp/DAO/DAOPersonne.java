@@ -17,16 +17,9 @@ import java.util.List;
  */
 public class DAOPersonne implements DAOInterface<Personne> {
 
-    private DAOConnexion conn ;
+    private DAOConnexion conn=DAOConnexion.getInsDB() ;
     private PreparedStatement st;
     
-    public DAOPersonne() {
-        if (conn != null) {
-            this.conn = conn;
-        } else {
-            conn = new DAOConnexion();
-        }
-    }
 
     @Override
     public List<Personne> listPersonne() {
@@ -64,21 +57,6 @@ public class DAOPersonne implements DAOInterface<Personne> {
         return rep;
     }
 
-    @Override
-    public List<Personne> search(String search) {
-        List<Personne> list=new ArrayList<Personne>();
-        try{
-            st=conn.getConn().prepareStatement("SELECT * FROM personne "+"WHERE nom LIKE"+"'"+search+"%'"+"OR prenom LIKE"+"'"+search+"%'"+"OR id LIKE"+"'"+search+"%'");
-            //st.setString(1, search);
-            conn.setResult(st.executeQuery());
-            while(conn.getResult().next()){
-                list.add(new Personne(conn.getResult().getInt("id"),conn.getResult().getString("nom"),conn.getResult().getString("prenom"),conn.getResult().getString("lieu_n"),conn.getResult().getString("date_n"),conn.getResult().getString("sexe"),conn.getResult().getString("profession"),conn.getResult().getString("description")));
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return list;
-    }
 
     @Override
     public void delete(int id) {

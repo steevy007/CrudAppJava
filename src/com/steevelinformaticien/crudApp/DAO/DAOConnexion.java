@@ -20,6 +20,7 @@ public class DAOConnexion {
     private Connection conn;
     private Statement st;
     private ResultSet result;
+    private static DAOConnexion insDB;
     private final String dbname = "crudapp";
     private final String pass = "";
     private final String user = "root";
@@ -28,7 +29,7 @@ public class DAOConnexion {
         try {
             //chargement du driver
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost/" + dbname, user, pass);
+            conn = DriverManager.getConnection("jdbc:mysql://192.168.0.175:3306/" + dbname, user, pass);
             st = (Statement) conn.createStatement();
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,6 +58,15 @@ public class DAOConnexion {
 
     public void setResult(ResultSet result) {
         this.result = result;
+    }
+
+    //singleton
+    public static DAOConnexion getInsDB() {
+        if (insDB == null) {
+            insDB = new DAOConnexion();
+        }
+
+        return insDB;
     }
 
 }

@@ -21,7 +21,9 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  *
@@ -61,11 +63,11 @@ public class PersonneController {
         this.V.getSearchFilter().addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                search();
+                search(V.getSearchFilter().getText());
             }
         });
         initTable();
-        numberPers();     
+        numberPers();
     }
 
     public void nettoyer() {
@@ -97,8 +99,8 @@ public class PersonneController {
             if (dao.Insert(M)) {
                 JOptionPane.showMessageDialog(V, "Insertion reussi");
                 update();
-                numberPers(); 
-                
+                numberPers();
+
             } else {
                 JOptionPane.showMessageDialog(V, "Faute Systeme");
             }
@@ -108,23 +110,23 @@ public class PersonneController {
     }
 
     public void modifier() {
-        if(!V.getTablePers().isRowSelected(V.getTablePers().getSelectedRow())){
-            JOptionPane.showMessageDialog(V,"Veuillez d'abort selectionner le champ a modifier");
-        }else{
+        if (!V.getTablePers().isRowSelected(V.getTablePers().getSelectedRow())) {
+            JOptionPane.showMessageDialog(V, "Veuillez d'abort selectionner le champ a modifier");
+        } else {
             if (V.getJt_nom().getText().isEmpty() || V.getJt_prenom().getText().isEmpty() || V.getJt_lieu().getText().isEmpty() || V.getJt_proffesion().getText().isEmpty() || V.getJdate_date().getDateFormatString().isEmpty() || V.getArea_desc().getText().isEmpty()) {
-            JOptionPane.showMessageDialog(V, "Veuillez Remlir Correctement les Champs");
-        } else if (V.getJdate_date().getDate().after(new Date())) {
-            JOptionPane.showMessageDialog(V, "La date de Naissance doit etre inferieur a la date du jour");
-        } else{
-        //convertir la date
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String date = dateFormat.format(V.getJdate_date().getDate());
-        Personne p = new Personne(0, V.getJt_nom().getText(), V.getJt_prenom().getText(), V.getJt_lieu().getText(), date, V.getJt_sexe().getSelectedItem().toString(), V.getJt_proffesion().getText(), V.getArea_desc().getText());
-        dao.edit(p, recupererId());
-        JOptionPane.showMessageDialog(V, "Modification Reussi");
-        update();
-        
-        }
+                JOptionPane.showMessageDialog(V, "Veuillez Remlir Correctement les Champs");
+            } else if (V.getJdate_date().getDate().after(new Date())) {
+                JOptionPane.showMessageDialog(V, "La date de Naissance doit etre inferieur a la date du jour");
+            } else {
+                //convertir la date
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String date = dateFormat.format(V.getJdate_date().getDate());
+                Personne p = new Personne(0, V.getJt_nom().getText(), V.getJt_prenom().getText(), V.getJt_lieu().getText(), date, V.getJt_sexe().getSelectedItem().toString(), V.getJt_proffesion().getText(), V.getArea_desc().getText());
+                dao.edit(p, recupererId());
+                JOptionPane.showMessageDialog(V, "Modification Reussi");
+                update();
+
+            }
         }
     }
 
@@ -170,7 +172,7 @@ public class PersonneController {
             if (rep == 0) {
                 JOptionPane.showMessageDialog(V, "Supression Reussi");
                 update();
-                numberPers(); 
+                numberPers();
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(V, "Veuillez Selectionner une ligne");
@@ -202,30 +204,17 @@ public class PersonneController {
             }
         }
     }
-    
-    public void search(){
-        model.setRowCount(0);
-         for (int i = 0; i < dao.search(V.getSearchFilter().getText()).size(); i++) {
-            Object[] obj = {
-                dao.search(V.getSearchFilter().getText()).get(i).getId(),
-                dao.search(V.getSearchFilter().getText()).get(i).getNom(),
-                dao.search(V.getSearchFilter().getText()).get(i).getPrenom(),
-                dao.search(V.getSearchFilter().getText()).get(i).getLieu_n(),
-                dao.search(V.getSearchFilter().getText()).get(i).getDate_n(),
-                dao.search(V.getSearchFilter().getText()).get(i).getSexe(),
-                dao.search(V.getSearchFilter().getText()).get(i).getProfession(),
-                dao.search(V.getSearchFilter().getText()).get(i).getDesc()
-            };
 
-            model.addRow(obj);
-        }
-        V.getTablePers().setModel(model);
-        numberPers(); 
-        
+    public void search(String value) {
+
+        TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(model);
+        V.getTablePers().setRowSorter(tr);
+        tr.setRowFilter(RowFilter.regexFilter(value));
+        numberPers();
     }
-    
-    public void numberPers(){
-        this.V.getNumberPers().setText(""+model.getRowCount());
+
+    public void numberPers() {
+        this.V.getNumberPers().setText("" + model.getRowCount());
     }
 
 }

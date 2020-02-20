@@ -18,8 +18,6 @@ public interface DAOInterface<T> {
 
     public boolean Insert(T t);
 
-    public List<T> search(String search);
-
     public void delete(int id);
     
     public void edit(T t,int id);
